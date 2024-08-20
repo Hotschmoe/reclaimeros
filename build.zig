@@ -22,6 +22,16 @@ pub fn build(b: *std.Build) void {
 
     b.installArtifact(kernel);
 
+    // Add a step to print when the build is complete
+    const build_step = b.step("build", "Build the kernel");
+    build_step.dependOn(&b.addInstallArtifact(kernel, .{}).step);
+
+    // Add a custom command to print the completion message
+    const print_done = b.addSystemCommand(&.{
+        "cmd.exe", "/C", "echo Kernel build complete!",
+    });
+    build_step.dependOn(&print_done.step);
+
     const run_cmd = b.addSystemCommand(&[_][]const u8{
         "qemu-system-aarch64",
         "-machine",
@@ -47,6 +57,13 @@ pub fn build(b: *std.Build) void {
         "-global",
         "loader.start_address=0x400000",
     });
+
+    // Add a step to print when QEMU is starting
+    const print_qemu_start = b.addSystemCommand(&.{
+        "cmd.exe", "/C", "echo Starting QEMU...",
+    });
+    run_cmd.step.dependOn(&print_qemu_start.step);
+
     run_cmd.step.dependOn(b.getInstallStep());
 
     const run_step = b.step("run", "Run the kernel in QEMU");

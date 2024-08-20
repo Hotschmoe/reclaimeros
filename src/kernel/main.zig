@@ -17,17 +17,8 @@ fn kmain() void {
 }
 
 export fn _start() linksection(".text._start") noreturn {
-    uart_puts("Entering _start...\n");
-
-    // Set up the stack pointer
-    asm volatile (
-        \\ ldr x30, =stack_top
-        \\ mov sp, x30
-    );
-    uart_puts("Stack pointer initialized...\n");
-
-    // Call the main kernel function
-    kmain();
+    // Output a single character
+    @as(*volatile u8, @ptrFromInt(0x09000000)).* = 'A';
 
     // Halt the CPU
     while (true) {
