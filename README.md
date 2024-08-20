@@ -36,18 +36,35 @@ Reclaimer OS is built on a layered, containerized architecture:
    - Input Container: Manages user input devices.
    - Application Containers: Run user applications, including potential Android apps.
 
+### Prerequisites
+
+- Zig (latest version)
+- QEMU
+
+### Building the Kernel
+
+1. Clone the repository:
+   ```
+   git clone https://github.com/hotschmoe/reclaimer-os.git
+   cd reclaimer-os
+   ```
+
+2. Build the kernel:
+   ```
+   zig build
+   ```
+
+3. Run the kernel in QEMU:
+   ```
+   zig build run
+   ```
+
 ## Development Status
 
-Reclaimer OS is currently in the early stages of development. We are focusing on:
+We are currently in the very early stages of development, focusing on:
 
-1. Setting up the basic kernel and HAL functionality.
-2. Implementing the container runtime and orchestrator.
-3. Developing the AI integration framework.
-4. Creating the networking stack.
-
-## Getting Started
-
-(Instructions for setting up the development environment, building the project, and running it in an emulator will be added as the project progresses.)
+1. Setting up a basic kernel that can boot and print a message.
+2. Establishing the build system and development workflow.
 
 ## Contributing
 
