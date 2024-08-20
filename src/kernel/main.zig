@@ -1,31 +1,38 @@
-const std = @import("std");
-
-// UART memory-mapped I/O address for QEMU virt machine
 const UART0: usize = 0x09000000;
 
-// Function to write a string to UART
-fn uart_puts(s: []const u8) void {
+fn uart_put(c: u8) void {
+    @as(*volatile u8, @ptrFromInt(UART0)).* = c;
+}
+
+fn uart_print(s: []const u8) void {
     for (s) |c| {
-        @as(*volatile u8, @ptrFromInt(UART0)).* = c;
+        uart_put(c);
     }
 }
 
-// Define kmain function
-fn kmain() void {
-    uart_puts("Hello Reclaimer!\n");
-    uart_puts("Kernel initialization complete on Cortex-A72.\n");
+fn uart_print_hex(n: usize) void {
+    const hex_chars = "0123456789ABCDEF";
+    var i: u6 = 60;
+    while (true) : (i -%= 4) {
+        uart_put(hex_chars[@as(u4, @truncate((n >> i) & 0xF))]);
+        if (i == 0) break;
+    }
 }
 
 export fn _start() linksection(".text._start") noreturn {
-    // Output a single character
-    @as(*volatile u8, @ptrFromInt(0x09000000)).* = 'A';
+    uart_print("Kernel starting at address: 0x");
+    uart_print_hex(@intFromPtr(&_start));
+    uart_print("\n");
 
-    // Halt the CPU
+    uart_print("UART address: 0x");
+    uart_print_hex(UART0);
+    uart_print("\n");
+
     while (true) {
-        asm volatile ("wfe");
+        uart_put('.');
+        var i: usize = 0;
+        while (i < 10000000) : (i += 1) {
+            asm volatile ("nop");
+        }
     }
 }
-
-// Define a stack for the kernel
-export var stack_bottom: [16 * 1024]u8 align(16) linksection(".bss") = undefined;
-export const stack_top = &stack_bottom[stack_bottom.len - 1];

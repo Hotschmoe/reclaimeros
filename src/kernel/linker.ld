@@ -2,25 +2,12 @@ ENTRY(_start)
 
 SECTIONS
 {
-    . = 0x400000; /* Starting address for the kernel */
-
+    . = 0x400000;
     .text : {
-        *(.text._start) /* Entry point */
-        *(.text*) /* All other text sections */
+        KEEP(*(.text._start))
+        *(.text)
     }
-
-    .rodata : {
-        *(.rodata*) /* Read-only data */
-    }
-
-    .data : {
-        *(.data*) /* Initialized data */
-    }
-
-    .bss : {
-        *(.bss*) /* Uninitialized data */
-        *(COMMON)
-    }
-
-    /DISCARD/ : { *(.note.GNU-stack) }
+    .rodata : { *(.rodata) }
+    .data : { *(.data) }
+    .bss : { *(.bss) }
 }
