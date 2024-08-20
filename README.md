@@ -98,7 +98,7 @@ This prompt can be used when seeking assistance from AI language models during t
 Reclaimer OS is built on a layered, containerized architecture. Here's a high-level view of the system structure:
 
 ```mermaid
-graph TD;
+graph TD
     A[Hardware Layer] --> B[Zig Kernel]
     B --> C[Hardware Abstraction Layer HAL]
     C --> D[Container Runtime]
@@ -117,14 +117,19 @@ graph TD;
     N --> K
     O[User Interface Layer] --> N
     P[LLM Update Service] --> H
+```
+
+Key components of the architecture:
+
+[... explanation of components here ...]
 
 ## File Structure
 
-Current File Structure, will change as needed. I have no idea what im doing (move to docs?)
+Current File Structure, will change as needed:
 
 ```mermaid
 graph TD
-    A[CoreTerra OS] --> B[src]
+    A[Reclaimer OS] --> B[src]
     A --> C[build.zig]
     A --> D[README.md]
     A --> E[LICENSE]
@@ -146,3 +151,21 @@ graph TD
     M --> U[ui_layer.zig]
     G --> V[architecture.md]
     G --> W[development_guide.md]
+```
+
+This file structure is subject to change as the project evolves. Here's a brief explanation of each main component:
+
+- `src/`: Contains all the source code for the OS.
+  - `kernel/`: Core OS functionality.
+  - `hal/`: Hardware Abstraction Layer code.
+  - `containers/`: Container runtime and orchestration logic.
+  - `llm/`: LLM integration and AI assistant functionality.
+  - `networking/`: Networking stack implementation.
+  - `ui/`: User interface code.
+- `docs/`: Project documentation.
+- `build.zig`: Zig build script.
+- `README.md`: Project overview and documentation.
+- `LICENSE`: License file.
+- `.gitignore`: Specifies intentionally untracked files to ignore.
+
+As development progresses, this structure may be refined to better suit the project's needs.
