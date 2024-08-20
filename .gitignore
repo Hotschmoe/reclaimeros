@@ -1,34 +1,10 @@
-# Prerequisites
-*.d
+# Zig build artifacts
+zig-cache/
+zig-out/
+build/
+build-*/
 
-# Object files
-*.o
-*.ko
-*.obj
-*.elf
-
-# Linker output
-*.ilk
-*.map
-*.exp
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Libraries
-*.lib
-*.a
-*.la
-*.lo
-
-# Shared objects (inc. Windows DLLs)
-*.dll
-*.so
-*.so.*
-*.dylib
-
-# Executables
+# Binaries
 *.exe
 *.out
 *.app
@@ -42,6 +18,27 @@
 *.idb
 *.pdb
 
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs and databases
+*.log
+*.sql
+*.sqlite
+
 # Kernel Module Compile Results
 *.mod*
 *.cmd
@@ -50,3 +47,24 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# Custom build output
+/output/
+/dist/
+
+# Dependency directories (if you decide to use any package managers in the future)
+/node_modules/
+/jspm_packages/
+
+# Optional: Uncomment if you're using CMake for any part of the project
+# CMakeLists.txt.user
+# CMakeCache.txt
+# CMakeFiles
+# CMakeScripts
+# Testing
+# Makefile
+# cmake_install.cmake
+# install_manifest.txt
+# compile_commands.json
+# CTestTestfile.cmake
+# _deps
