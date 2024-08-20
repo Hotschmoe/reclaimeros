@@ -1,23 +1,26 @@
 ENTRY(_start)
 
-SECTIONS {
-    . = 0x40000000;  /* Typical load address for ARM */
+SECTIONS
+{
+    . = 0x400000; /* Starting address for the kernel */
 
-    .text : ALIGN(4K) {
-        *(.text.boot)  /* Boot code section */
-        *(.text*)
+    .text : {
+        *(.text._start) /* Entry point */
+        *(.text*) /* All other text sections */
     }
 
-    .rodata : ALIGN(4K) {
-        *(.rodata*)
+    .rodata : {
+        *(.rodata*) /* Read-only data */
     }
 
-    .data : ALIGN(4K) {
-        *(.data*)
+    .data : {
+        *(.data*) /* Initialized data */
     }
 
-    .bss : ALIGN(4K) {
+    .bss : {
+        *(.bss*) /* Uninitialized data */
         *(COMMON)
-        *(.bss*)
     }
+
+    /DISCARD/ : { *(.note.GNU-stack) }
 }
