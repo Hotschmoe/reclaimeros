@@ -35,11 +35,13 @@ pub fn build(b: *std.Build) void {
     const run_cmd = b.addSystemCommand(&[_][]const u8{
         "qemu-system-aarch64",
         "-machine",
-        "virt",
+        "virt,secure=off",
         "-cpu",
         "cortex-a72",
         "-kernel",
         b.getInstallPath(.bin, "kernel"),
+        "-bios",
+        "rom.bin",
         "-serial",
         "stdio",
         "-display",
@@ -54,8 +56,11 @@ pub fn build(b: *std.Build) void {
         "128M",
         "-no-reboot",
         "-no-shutdown",
+        "-nodefaults",
+        "-semihosting",
         "-global",
         "loader.start_address=0x400000",
+        "-S", // Freeze CPU at startup
     });
 
     // Add a step to print when QEMU is starting
