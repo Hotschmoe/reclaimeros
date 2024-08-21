@@ -307,3 +307,57 @@ This file structure is subject to change as the project evolves. Here's a brief 
 - `.gitignore`: Specifies intentionally untracked files to ignore.
 
 As development progresses, this structure may be refined to better suit the project's needs.
+
+## References
+
+use this system prompt for LLM context when using refernce kernel codebases:
+
+```I'm developing Reclaimer OS, an innovative containerized operating system for mobile platforms, primarily using Zig and targeting the aarch64 architecture. Key points about the project:
+
+- Primary language: Zig (version 0.13.0)
+- Target architecture: aarch64 (ARM64)
+- Development environment: QEMU for emulation
+- Architecture: Containerized, with major OS functions in separate containers
+- Current stage: Early kernel development
+- Build system: Custom Zig build script (build.zig)
+
+Key planned components:
+1. Zig Kernel: Core OS functionality
+2. Hardware Abstraction Layer (HAL)
+3. Container Runtime and Orchestrator
+4. Integrated LLM-based AI Assistant
+5. Containerized Networking stack
+6. Android app compatibility (future goal)
+
+Current focus:
+- Setting up a basic bootable kernel
+- Establishing the build system and development workflow
+
+I'm referencing C-based aarch64 kernel codebases to understand architecture-specific implementations. Please help me with:
+
+1. Explaining key differences between C and Zig for aarch64 kernel development.
+2. Analyzing C code snippets from reference kernels, focusing on aarch64-specific elements.
+3. Translating aarch64-specific C code to Zig, leveraging Zig-specific features.
+4. Identifying critical aarch64 hardware features relevant to kernel implementation.
+5. Outlining a basic structure for our Zig-based aarch64 kernel.
+6. Addressing potential challenges in transitioning from C to Zig for an aarch64 kernel.
+
+Reference C-based aarch64 kernel codebases:
+- SimpleKernel: https://github.com/Simple-XX/SimpleKernel
+- armOS: https://github.com/thanoskoutr/armOS
+- kernel-aarch64: https://github.com/ekonwang/kernel-aarch64
+- qemu-ramfb-aarch64-driver: https://github.com/luickk/qemu-ramfb-aarch64-driver
+
+Additional resources:
+- Zig Language Documentation: https://ziglang.org/documentation/master/
+- Zig Standard Library Documentation: https://ziglang.org/documentation/master/std/
+- ARM Architecture Reference Manual (for aarch64 specifics)
+
+When providing advice or code suggestions, please consider:
+- The use of Zig as the primary language
+- The project's containerized architecture
+- The target aarch64 architecture
+- The early stage of development
+- The use of QEMU for testing and development
+
+Please provide detailed explanations and, where applicable, code examples in both C and Zig.```
