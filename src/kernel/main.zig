@@ -37,15 +37,9 @@ export fn kmain() noreturn {
     console.puts("Returned from alloc_page\n");
     delay(10000);
 
-    console.puts("Checking allocation result\n");
-    delay(10000);
-    if (allocation) |addr| {
-        console.puts("Alloc success: ");
-        console.putInt(addr);
-        console.puts("\n");
-    } else {
-        console.puts("Alloc failed\n");
-    }
+    console.puts("Allocation result: ");
+    console.putInt(allocation);
+    console.puts("\n");
     delay(100000);
 
     console.puts("End of main\n");

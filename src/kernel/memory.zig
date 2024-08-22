@@ -41,35 +41,15 @@ pub fn alloc_page() usize {
     console.puts("Before return\n");
     delay(10000);
 
-    // Add assembly-level debugging
-    asm volatile (
-        \\mov x0, %[addr]
-        \\str x30, [sp, #-16]!
-        \\bl debug_print_reg
-        \\ldr x30, [sp], #16
-        :
-        : [addr] "r" (addr),
-        : "x0", "memory"
-    );
+    console.puts("Return value: ");
+    console.putInt(addr);
+    console.puts("\n");
+    delay(10000);
 
-    console.puts("After debug print\n");
+    console.puts("After printing return value\n");
     delay(10000);
 
     return addr;
-}
-
-// Function to print a register value (implement this in assembly)
-pub fn debug_print_reg(value: usize) void {
-    asm volatile (
-        \\mov x1, x0
-        \\adr x0, debug_str
-        \\bl printf
-        \\ret
-        \\debug_str: .asciz "Debug: x0 = %lx\n"
-        :
-        : [value] "{x0}" (value),
-        : "x0", "x1", "memory"
-    );
 }
 
 pub fn free_page(addr: usize) void {
