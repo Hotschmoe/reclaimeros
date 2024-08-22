@@ -44,7 +44,7 @@ pub fn build(b: *std.Build) void {
         "zig-out/bin/kernel.elf",
         "-nographic",
         "-m",
-        "1G",
+        "128M",
     };
     const run_cmd = b.addSystemCommand(run_cmd_args);
     run_cmd.step.dependOn(&install_step.step);
