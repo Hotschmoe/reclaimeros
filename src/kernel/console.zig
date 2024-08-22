@@ -5,24 +5,27 @@ const UART_BASE: usize = 0x09000000;
 
 // UART registers
 const UART_DR: *volatile u32 = @ptrFromInt(UART_BASE + 0x00);
+const UART_FR: *volatile u32 = @ptrFromInt(UART_BASE + 0x18);
+
+fn delay(cycles: usize) void {
+    var i: usize = 0;
+    while (i < cycles) : (i += 1) {
+        asm volatile ("" ::: "memory");
+    }
+}
 
 pub fn putchar(c: u8) void {
+    while ((UART_FR.* & (1 << 5)) != 0) {
+        delay(100);
+    }
     UART_DR.* = c;
+    delay(1000);
 }
 
 pub fn puts(s: []const u8) void {
     for (s) |c| {
         putchar(c);
     }
-}
-
-pub fn printf(comptime fmt: []const u8, args: anytype) void {
-    var buf: [100]u8 = undefined;
-    const slice = std.fmt.bufPrint(&buf, fmt, args) catch {
-        puts("Error: printf buffer overflow\n");
-        return;
-    };
-    puts(slice);
 }
 
 pub fn putInt(value: usize) void {
