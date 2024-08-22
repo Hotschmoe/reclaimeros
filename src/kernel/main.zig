@@ -31,15 +31,22 @@ export fn kmain() noreturn {
     console.puts("Attempting allocation\n");
     delay(100000);
 
-    const page = memory.alloc_page();
+    console.puts("Calling alloc_page\n");
+    delay(10000);
+    const allocation = memory.alloc_page();
+    console.puts("Returned from alloc_page\n");
+    delay(10000);
 
-    if (page) |addr| {
+    console.puts("Checking allocation result\n");
+    delay(10000);
+    if (allocation) |addr| {
         console.puts("Alloc success: ");
         console.putInt(addr);
         console.puts("\n");
     } else {
         console.puts("Alloc failed\n");
     }
+    delay(100000);
 
     console.puts("End of main\n");
     delay(100000);

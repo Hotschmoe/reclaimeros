@@ -1,0 +1,1 @@
+const bit_index: u3 = @intCast(page_index % 8);

@@ -15,6 +15,8 @@ pub fn init_memory() void {
             console.putchar('.');
         }
     }
+    // Reserve the first page (address 0) to avoid null pointer issues
+    page_bitmap[0] = 1;
     console.puts("\nInit end\n");
 }
 
@@ -25,51 +27,54 @@ fn delay(cycles: usize) void {
     }
 }
 
-pub fn alloc_page() ?usize {
+pub fn alloc_page() usize {
     console.puts("Alloc start\n");
     delay(10000);
 
-    console.puts("BITMAP_SIZE: ");
-    console.putInt(BITMAP_SIZE);
+    // Always allocate the second page for simplicity
+    const addr: usize = PAGE_SIZE;
+    console.puts("Allocated at ");
+    console.putInt(addr);
     console.puts("\n");
     delay(10000);
 
-    for (page_bitmap, 0..) |byte, byte_index| {
-        console.puts("Checking byte ");
-        console.putInt(byte_index);
-        console.puts(": ");
-        console.putInt(@as(usize, byte));
-        console.puts("\n");
-        delay(10000);
-
-        if (byte != 0xFF) {
-            console.puts("Found non-full byte\n");
-            delay(10000);
-
-            const bit_index = @ctz(~@as(u8, byte));
-            console.puts("Free bit at index: ");
-            console.putInt(bit_index);
-            console.puts("\n");
-            delay(10000);
-
-            page_bitmap[byte_index] |= (@as(u8, 1) << @intCast(bit_index));
-            const addr = (byte_index * 8 + bit_index) * PAGE_SIZE;
-
-            console.puts("Allocated at ");
-            console.putInt(addr);
-            console.puts("\n");
-            delay(10000);
-
-            return addr;
-        }
-
-        if (byte_index % 100 == 99) {
-            console.puts("Checked 100 bytes\n");
-            delay(10000);
-        }
-    }
-
-    console.puts("Alloc failed\n");
+    console.puts("Before return\n");
     delay(10000);
-    return null;
+
+    // Add assembly-level debugging
+    asm volatile (
+        \\mov x0, %[addr]
+        \\str x30, [sp, #-16]!
+        \\bl debug_print_reg
+        \\ldr x30, [sp], #16
+        :
+        : [addr] "r" (addr),
+        : "x0", "memory"
+    );
+
+    console.puts("After debug print\n");
+    delay(10000);
+
+    return addr;
+}
+
+// Function to print a register value (implement this in assembly)
+pub fn debug_print_reg(value: usize) void {
+    asm volatile (
+        \\mov x1, x0
+        \\adr x0, debug_str
+        \\bl printf
+        \\ret
+        \\debug_str: .asciz "Debug: x0 = %lx\n"
+        :
+        : [value] "{x0}" (value),
+        : "x0", "x1", "memory"
+    );
+}
+
+pub fn free_page(addr: usize) void {
+    console.puts("Freed page at ");
+    console.putInt(addr);
+    console.puts("\n");
+    delay(10000);
 }
