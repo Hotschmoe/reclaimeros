@@ -28,17 +28,16 @@ export fn kmain() noreturn {
     console.puts("Init done\n");
     delay(100000);
 
-    console.puts("Attempting allocation\n");
+    console.puts("Before allocation\n");
     delay(100000);
 
-    console.puts("Calling alloc_page\n");
-    delay(10000);
-    const allocation = memory.alloc_page();
-    console.puts("Returned from alloc_page\n");
-    delay(10000);
+    const addr = memory.alloc_page();
 
-    console.puts("Allocation result: ");
-    console.putInt(allocation);
+    console.puts("After allocation\n");
+    delay(100000);
+
+    console.puts("Allocated address: ");
+    console.putInt(addr);
     console.puts("\n");
     delay(100000);
 
