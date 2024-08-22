@@ -265,32 +265,6 @@ Key components of the architecture:
 
 Current File Structure, will change as needed:
 
-```mermaid
-graph TD
-    A[Reclaimer OS] --> B[src]
-    A --> C[build.zig]
-    A --> D[README.md]
-    A --> E[LICENSE]
-    A --> F[.gitignore]
-    A --> G[docs]
-    B --> H[kernel]
-    B --> I[hal]
-    B --> J[containers]
-    B --> K[llm]
-    B --> L[networking]
-    B --> M[ui]
-    H --> N[main.zig]
-    I --> O[hal.zig]
-    J --> P[runtime.zig]
-    J --> Q[orchestrator.zig]
-    K --> R[llm_container.zig]
-    K --> S[ai_assistant.zig]
-    L --> T[network_container.zig]
-    M --> U[ui_layer.zig]
-    G --> V[architecture.md]
-    G --> W[development_guide.md]
-```
-
 This file structure is subject to change as the project evolves. Here's a brief explanation of each main component:
 
 - `src/`: Contains all the source code for the OS.
@@ -343,7 +317,6 @@ I'm referencing C-based aarch64 kernel codebases to understand architecture-spec
 6. Addressing potential challenges in transitioning from C to Zig for an aarch64 kernel.
 
 Reference C-based aarch64 kernel codebases:
-- SimpleKernel: https://github.com/Simple-XX/SimpleKernel
 - armOS: https://github.com/thanoskoutr/armOS
 - kernel-aarch64: https://github.com/ekonwang/kernel-aarch64
 - qemu-ramfb-aarch64-driver: https://github.com/luickk/qemu-ramfb-aarch64-driver
