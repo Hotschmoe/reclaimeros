@@ -1,4 +1,5 @@
 const std = @import("std");
+const console = @import("console.zig");
 
 // Constants
 const PAGE_SIZE: usize = 4096; // 4KB pages
@@ -9,8 +10,26 @@ const TOTAL_PAGES: usize = TOTAL_MEMORY / PAGE_SIZE;
 var page_bitmap: [TOTAL_PAGES / 8]u8 = undefined;
 
 pub fn init_memory() void {
-    // Initialize all pages as free
-    @memset(&page_bitmap, 0);
+    console.puts("Starting memory initialization...\n");
+
+    const chunk_size: usize = 1024; // Initialize in chunks and report progress
+    var initialized: usize = 0;
+    while (initialized < page_bitmap.len) {
+        const end = @min(initialized + chunk_size, page_bitmap.len);
+        for (initialized..end) |i| {
+            page_bitmap[i] = 0;
+        }
+        initialized = end;
+
+        console.puts("Initialized chunk. Total: ");
+        putInt(initialized * 8 * PAGE_SIZE);
+        console.puts(" bytes\n");
+    }
+
+    console.puts("Memory bitmap initialized.\n");
+    console.puts("Total pages: ");
+    putInt(TOTAL_PAGES);
+    console.puts("\n");
 }
 
 pub fn alloc_page() ?usize {
@@ -33,4 +52,19 @@ pub fn free_page(addr: usize) void {
     const byte_index = page_index / 8;
     const bit_index: u3 = @truncate(page_index % 8);
     page_bitmap[byte_index] &= ~(@as(u8, 1) << bit_index);
+}
+
+pub fn putInt(value: usize) void {
+    if (value == 0) {
+        console.puts("0");
+        return;
+    }
+    var buf: [20]u8 = undefined;
+    var i: usize = 0;
+    var v = value;
+    while (v > 0) : (v /= 10) {
+        buf[19 - i] = @intCast((v % 10) + '0');
+        i += 1;
+    }
+    console.puts(buf[20 - i ..]);
 }

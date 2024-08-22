@@ -1,21 +1,44 @@
 const std = @import("std");
-const fmt = std.fmt;
-const Writer = std.io.Writer;
 
-var buffer = @as([*]volatile u16, @ptrFromInt(0x09000000));
+// QEMU UART address
+const UART_BASE: usize = 0x09000000;
 
-pub fn puts(data: []const u8) void {
-    for (data) |c|
-        buffer[0] = c;
+// UART registers
+const UART_DR: *volatile u32 = @ptrFromInt(UART_BASE + 0x00);
+
+pub fn putchar(c: u8) void {
+    UART_DR.* = c;
 }
 
-pub const writer = Writer(void, error{}, callback){ .context = {} };
-
-fn callback(_: void, string: []const u8) error{}!usize {
-    puts(string);
-    return string.len;
+pub fn puts(s: []const u8) void {
+    for (s) |c| {
+        putchar(c);
+    }
 }
 
-pub fn printf(comptime format: []const u8, args: anytype) void {
-    fmt.format(writer, format, args) catch unreachable;
+pub fn printf(comptime fmt: []const u8, args: anytype) void {
+    var buf: [100]u8 = undefined;
+    const slice = std.fmt.bufPrint(&buf, fmt, args) catch {
+        puts("Error: printf buffer overflow\n");
+        return;
+    };
+    puts(slice);
+}
+
+pub fn putInt(value: usize) void {
+    if (value == 0) {
+        putchar('0');
+        return;
+    }
+
+    var buf: [20]u8 = undefined;
+    var i: usize = 0;
+    var v = value;
+
+    while (v > 0) : (v /= 10) {
+        buf[19 - i] = @intCast((v % 10) + '0');
+        i += 1;
+    }
+
+    puts(buf[20 - i ..]);
 }
