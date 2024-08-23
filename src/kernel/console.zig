@@ -45,3 +45,29 @@ pub fn putInt(value: usize) void {
 
     puts(buf[20 - i ..]);
 }
+
+pub fn putIntHex(value: usize) void {
+    const hex_digits = "0123456789ABCDEF";
+    var temp: [16]u8 = undefined; // Buffer to store the hex representation
+    var i: usize = 0;
+
+    // Convert the integer to a hexadecimal string
+    var val = value;
+    while (val > 0) {
+        temp[i] = hex_digits[val & 0xF];
+        val >>= 4;
+        i += 1;
+    }
+
+    if (i == 0) {
+        // Special case for value == 0
+        puts("0");
+        return;
+    }
+
+    // Print the hex string in reverse order
+    while (i > 0) {
+        i -= 1;
+        putchar(temp[i]);
+    }
+}
