@@ -12,6 +12,29 @@ Reclaimer OS combines cutting-edge technologies and concepts:
 - **Hardware AI Acceleration**: Designed to leverage AI accelerators in modern mobile chipsets.
 - **Android Compatibility**: Initial support for running Android apps in containers.
 
+Why Create a New Kernel in Zig for Container Orchestration?
+1. Performance and Efficiency
+Low-Level Control: Writing a kernel in Zig provides fine-grained control over hardware and system resources, enabling performance optimization for container orchestration tasks.
+Minimalism: This kernel is designed specifically for container orchestration, stripping away unnecessary features found in general-purpose operating systems, resulting in a more lightweight and efficient system.
+2. Security
+Built-in Safety: Zig offers safety features like bounds checking and null safety, while still allowing low-level control, helping to build a more secure kernel with fewer vulnerabilities.
+Isolation: A custom kernel allows for the implementation of advanced security models tailored to containerization, improving isolation between containers and reducing the attack surface.
+3. Customizability
+Tailored Design: The kernel architecture and container orchestration mechanisms are designed to meet specific needs or support novel features that existing kernels might not efficiently support.
+Modular Architecture: The kernel is built with a modular architecture in mind, where each component (e.g., networking, storage) is designed as a container itself, offering extreme flexibility and customization.
+4. Modern Language Benefits
+Zig’s Simplicity and Power: Zig combines low-level control with modern language features, making it an excellent choice for systems programming. Its simple syntax, lack of hidden control flow, and manual memory management are ideal for kernel development.
+Compile-time Guarantees: Zig’s powerful compile-time checks and optimizations reduce runtime errors, improving the reliability of the kernel.
+5. Learning and Innovation
+Research and Experimentation: Building a kernel from scratch is a valuable learning experience and provides opportunities to experiment with new ideas in systems programming, containerization, and operating system design.
+Community Contribution: This project contributes to the open-source community, providing a platform that others can build upon, extend, or learn from.
+6. Niche Applications
+Specialized Use Cases: The kernel is optimized for container orchestration in resource-constrained environments like IoT devices, edge computing, or specialized data centers.
+Mobile and Edge Computing: It is designed to efficiently manage containers on mobile or edge devices, where resources are limited, and existing kernels may not be optimized.
+7. Future-Proofing
+Modern Hardware Support: The kernel targets modern hardware architectures (e.g., ARM, RISC-V), optimizing for features like AI accelerators, specialized processors, or secure enclaves.
+Integration with Modern Technologies: The kernel is designed with native support for emerging technologies, such as AI-driven resource management, real-time analytics, or decentralized networks.
+
 ## Key Features
 
 1. **Containerized Architecture**: Every major OS function runs in its own container.
@@ -35,6 +58,7 @@ Reclaimer OS is built on a layered, containerized architecture:
    - Display Container: Handles graphics and UI.
    - Input Container: Manages user input devices.
    - Application Containers: Run user applications, including potential Android apps.
+   - Storage Container: Manages all storage functions. (easy to implement alt filesystems?)
 
 ### Prerequisites
 
