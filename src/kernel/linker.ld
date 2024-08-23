@@ -1,8 +1,10 @@
-ENTRY(_start)
- 
 SECTIONS {
     . = 0x40000000;
-    .text : { *(.text) }
+    .text : ALIGN(2048) { /* Align to 2048 bytes for the exception vector table */
+        KEEP(*(.text.exception_vector_table))
+        *(.text)
+    }
+    .rodata : { *(.rodata) }
     .data : { *(.data) }
     .bss : { *(.bss COMMON) }
     . = ALIGN(8);

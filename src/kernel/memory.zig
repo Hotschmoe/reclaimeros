@@ -47,7 +47,7 @@ pub fn alloc_page() usize {
 pub fn free_page(addr: usize) void {
     if (addr < MEMORY_START or addr >= MEMORY_START + (TOTAL_PAGES * PAGE_SIZE)) {
         console.puts("Invalid address for freeing: 0x");
-        console.putInt(addr);
+        console.putIntHex(addr);
         console.puts("\n");
         return;
     }
@@ -55,14 +55,14 @@ pub fn free_page(addr: usize) void {
     const page_index = (addr - MEMORY_START) / PAGE_SIZE;
     if (!page_bitmap[page_index]) {
         console.puts("Double free detected at address: 0x");
-        console.putInt(addr);
+        console.putIntHex(addr);
         console.puts("\n");
         return;
     }
 
     page_bitmap[page_index] = false;
     console.puts("Freed page at address: 0x");
-    console.putInt(addr);
+    console.putIntHex(addr);
     console.puts("\n");
 }
 

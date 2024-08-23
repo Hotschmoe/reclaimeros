@@ -1,5 +1,6 @@
 const console = @import("console.zig");
 const memory = @import("memory.zig");
+const exceptions = @import("exceptions.zig");
 
 comptime {
     asm (
@@ -25,7 +26,11 @@ export fn kmain() noreturn {
     delay(100000);
 
     memory.init_memory();
-    console.puts("Init done\n");
+    console.puts("Memory init done\n");
+    delay(100000);
+
+    exceptions.init_exceptions();
+    console.puts("Exceptions init done\n");
     delay(100000);
 
     console.puts("Initial free pages: ");
@@ -68,6 +73,6 @@ export fn kmain() noreturn {
 
     while (true) {
         console.puts("Heartbeat\n");
-        delay(1000000);
+        delay(100000000);
     }
 }
