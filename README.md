@@ -60,6 +60,24 @@ Reclaimer OS is built on a layered, containerized architecture:
    - Application Containers: Run user applications, including potential Android apps.
    - Storage Container: Manages all storage functions. (easy to implement alt filesystems?)
 
+### Container Update Process
+
+Reclaimer OS implements a sophisticated container update mechanism to ensure system stability and minimize downtime:
+
+1. **Parallel Deployment**: When a system container (e.g., networking stack) is updated, the new version is launched alongside the currently running container.
+
+2. **Fallback Mode**: The original container continues to handle all ingress and egress traffic while the new container initializes.
+
+3. **Gradual Transition**: Once ready, the system attempts to switch priority to the new container, placing the original in a fallback state. (maybe do health checks and tests on new container before switching)
+
+4. **Automatic Rollback**: If the new container fails or behaves unexpectedly, the system automatically falls back to the original, ensuring continued functionality.
+
+5. **Health Checks**: (rerun?) The system runs tests to verify the health and proper operation of the new container.
+
+6. **Cleanup**: After successful transition and verification, the original container is safely brought down and destroyed.
+
+This update process allows for seamless, zero-downtime updates with built-in fallback mechanisms, enhancing system reliability and maintainability.
+
 ### Prerequisites
 
 - Zig (latest version)
