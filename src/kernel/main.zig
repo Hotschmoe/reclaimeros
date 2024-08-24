@@ -31,8 +31,18 @@ fn delay(cycles: usize) void {
 export fn kmain() noreturn {
     puts("Kernel starting\n");
 
+    var sp: usize = undefined;
+    asm volatile ("mov %[sp], sp"
+        : [sp] "=r" (sp),
+    );
+    puts("Initial stack pointer: 0x");
+    putIntHex(sp);
+    puts("\n");
+
     init_memory();
+    test_memory();
     init_exceptions();
+    init_uptime(); // Initialize the boot time
 
     puts("Kernel initialization complete\n");
     puts("Starting shell...\n");
@@ -119,16 +129,24 @@ fn getchar() u8 {
 
 // ---------- MEMORY ----------
 
-pub const PAGE_SIZE: usize = 4096;
-pub const TOTAL_PAGES: usize = 1024; // 4MB of manageable memory
+pub const PAGE_SIZE: usize = 4096; // 4KB per page
+pub const TOTAL_PAGES: usize = (128 * 1024 * 1024) / PAGE_SIZE; // 128MB of manageable memory
 pub const MEMORY_START: usize = 0x41000000; // Start of manageable memory
 
 var page_bitmap: [TOTAL_PAGES]bool = undefined;
 
+// _ = memset(@ptrCast(&page_bitmap), 0, TOTAL_PAGES);
+
 pub fn init_memory() void {
     puts("Initializing memory management system\n");
+    puts("TOTAL_PAGES: ");
+    putInt(TOTAL_PAGES);
+    puts("\n");
+    puts("Total memory: ");
+    putInt(TOTAL_PAGES * PAGE_SIZE / 1024 / 1024);
+    puts(" MB\n");
     _ = memset(@ptrCast(&page_bitmap), 0, TOTAL_PAGES);
-    puts("Memory initialization complete\n");
+    puts("Memory initialization complete.\n");
 }
 
 pub fn memset(dest: [*]u8, c: u8, n: usize) [*]u8 {
@@ -164,12 +182,20 @@ pub fn free_page(addr: usize) void {
 }
 
 pub fn get_free_page_count() usize {
+    puts("Counting free pages...\n");
     var count: usize = 0;
-    for (page_bitmap) |is_allocated| {
-        if (!is_allocated) {
+    var i: usize = 0;
+    while (i < TOTAL_PAGES) : (i += 1) {
+        if (!page_bitmap[i]) {
             count += 1;
         }
+        if (i % (TOTAL_PAGES / 10) == 0) {
+            puts("Progress: ");
+            putInt((i * 100) / TOTAL_PAGES);
+            puts("%\n");
+        }
     }
+    puts("Free page count complete.\n");
     return count;
 }
 
@@ -239,6 +265,28 @@ export fn exception_vector_table() callconv(.Naked) void {
 
 export fn handle_sync_exception() callconv(.C) void {
     puts("Synchronous exception occurred\n");
+
+    var esr: u64 = undefined;
+    var elr: u64 = undefined;
+    var far: u64 = undefined;
+
+    asm volatile (
+        \\mrs %[esr], esr_el1
+        \\mrs %[elr], elr_el1
+        \\mrs %[far], far_el1
+        : [esr] "=r" (esr),
+          [elr] "=r" (elr),
+          [far] "=r" (far),
+    );
+
+    puts("ESR: 0x");
+    putIntHex(esr);
+    puts("\nELR: 0x");
+    putIntHex(elr);
+    puts("\nFAR: 0x");
+    putIntHex(far);
+    puts("\n");
+
     while (true) {}
 }
 
@@ -249,6 +297,23 @@ export fn handle_irq() callconv(.C) void {
 
 export fn handle_fiq() callconv(.C) void {
     puts("FIQ occurred\n");
+
+    var elr: u64 = undefined;
+    var spsr: u64 = undefined;
+
+    asm volatile (
+        \\mrs %[elr], elr_el1
+        \\mrs %[spsr], spsr_el1
+        : [elr] "=r" (elr),
+          [spsr] "=r" (spsr),
+    );
+
+    puts("ELR: 0x");
+    putIntHex(elr);
+    puts("\nSPSR: 0x");
+    putIntHex(spsr);
+    puts("\n");
+
     while (true) {}
 }
 
@@ -274,8 +339,23 @@ const MAX_CMD_LENGTH: usize = 64;
 var cmd_buffer: [MAX_CMD_LENGTH]u8 = undefined;
 var cmd_index: usize = 0;
 
-fn shell_prompt() void {
+fn display_prompt() void {
     puts("kernel> ");
+}
+
+fn shell_prompt() void {
+    puts("\n");
+    puts("______ _____ _____  _       ___  ________  ___ ___________   \n");
+    puts("| ___ \\  ___/  __ \\| |     / _ \\|_   _|  \\/  ||  ___| ___ \\  \n");
+    puts("| |_/ / |__ | /  \\/| |    / /_\\ \\ | | | .  . || |__ | |_/ /  \n");
+    puts("|    /|  __|| |    | |    |  _  | | | | |\\/| ||  __||    /   \n");
+    puts("| |\\ \\| |___| \\__/\\| |____| | | |_| |_| |  | || |___| |\\ \\   \n");
+    puts("\\_| \\_\\____/ \\____/\\_____/\\_| |_/\\___/\\_|  |_/\\____/\\_| \\_|  \n");
+    puts("\n");
+    puts("Welcome, Reclaimer. The fate of humanity rests in your hands.\n");
+    puts("May the wisdom of the Forerunners guide your commands.\n");
+    puts("\n");
+    display_prompt();
 }
 
 fn process_command() void {
@@ -283,11 +363,26 @@ fn process_command() void {
 
     if (str_eq(cmd, "help")) {
         puts("Available commands:\n");
-        puts("  help   - Display this help message\n");
-        puts("  reboot - Reboot the system\n");
+        puts("  help     - Display this help message\n");
+        puts("  reboot   - Reboot the system\n");
+        puts("  meminfo  - Display memory usage information\n");
+        puts("  uptime   - Show system uptime\n");
+        puts("  echo     - Echo the following text\n");
+        puts("  version  - Display kernel version\n");
     } else if (str_eq(cmd, "reboot")) {
         puts("Rebooting...\n");
         reboot();
+    } else if (str_eq(cmd, "meminfo")) {
+        test_memory();
+        display_meminfo();
+    } else if (str_eq(cmd, "uptime")) {
+        display_uptime();
+    } else if (str_starts_with(cmd, "echo ")) {
+        puts(cmd[5..]);
+        puts("\n");
+    } else if (str_eq(cmd, "version")) {
+        puts("RECLAIMER Kernel v0.1\n");
+        puts("Built with Zig 0.13 for aarch64\n");
     } else {
         puts("Unknown command. Type 'help' for available commands.\n");
     }
@@ -303,6 +398,58 @@ fn str_eq(a: []const u8, b: []const u8) bool {
     return true;
 }
 
+fn str_starts_with(s: []const u8, prefix: []const u8) bool {
+    if (s.len < prefix.len) return false;
+    return str_eq(s[0..prefix.len], prefix);
+}
+
+fn display_meminfo() void {
+    puts("Gathering memory information...\n");
+    const free_pages = get_free_page_count();
+    const total_pages = TOTAL_PAGES;
+    const used_pages = total_pages - free_pages;
+
+    puts("Memory Information:\n");
+    puts("  Total memory: ");
+    putInt(total_pages * PAGE_SIZE / 1024 / 1024);
+    puts(" MB\n");
+    puts("  Total pages: ");
+    putInt(total_pages);
+    puts("\n  Used pages:  ");
+    putInt(used_pages);
+    puts(" (");
+    putInt((used_pages * 100) / total_pages);
+    puts("%)\n");
+    puts("  Free pages:  ");
+    putInt(free_pages);
+    puts(" (");
+    putInt((free_pages * 100) / total_pages);
+    puts("%)\n");
+}
+
+var boot_time: u64 = undefined;
+
+fn init_uptime() void {
+    boot_time = get_system_time();
+}
+
+fn display_uptime() void {
+    const current_time = get_system_time();
+    const uptime = current_time - boot_time;
+
+    puts("System uptime: ");
+    putInt(uptime / 1000000); // Convert microseconds to seconds
+    puts(" seconds\n");
+}
+
+fn get_system_time() u64 {
+    var time: u64 = undefined;
+    asm volatile ("mrs %[time], cntpct_el0"
+        : [time] "=r" (time),
+    );
+    return time;
+}
+
 fn shell_input(c: u8) void {
     switch (c) {
         '\r', '\n' => {
@@ -310,7 +457,7 @@ fn shell_input(c: u8) void {
             if (cmd_index > 0) {
                 process_command();
             }
-            shell_prompt();
+            display_prompt();
         },
         8, 127 => { // Backspace and Delete
             if (cmd_index > 0) {
@@ -344,3 +491,31 @@ fn reboot() noreturn {
 
 var kernel_stack: [16 * 1024]u8 align(16) = undefined;
 export var stack_top: *u8 = &kernel_stack[kernel_stack.len - 1];
+
+// ---------- TESTS ----------
+
+fn test_memory() void {
+    puts("Running memory test...\n");
+    var allocated_pages: usize = 0;
+    while (allocated_pages < 10) {
+        if (alloc_page()) |addr| {
+            allocated_pages += 1;
+            puts("Allocated page at 0x");
+            putIntHex(addr);
+            puts("\n");
+        } else {
+            puts("Failed to allocate page\n");
+            break;
+        }
+    }
+    puts("Allocated ");
+    putInt(allocated_pages);
+    puts(" pages\n");
+
+    // Free the allocated pages
+    var i: usize = 0;
+    while (i < allocated_pages) : (i += 1) {
+        free_page(MEMORY_START + (i * PAGE_SIZE));
+    }
+    puts("Freed all allocated pages\n");
+}
