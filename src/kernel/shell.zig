@@ -38,6 +38,7 @@ pub fn process_command() void {
         console.puts("  echo          - Echo the following text\n");
         console.puts("  version       - Display kernel version\n");
         console.puts("  memtest       - Run verbose memory test\n");
+        console.puts("  memtest_hard  - Run strenuous memory test\n");
         console.puts("  shutdown      - Exit and shutdown the system\n");
     } else if (str_eq(cmd, "reboot")) {
         console.puts("Rebooting...\n");
@@ -54,6 +55,8 @@ pub fn process_command() void {
         console.puts("Built with Zig 0.13 for aarch64\n");
     } else if (str_eq(cmd, "memtest")) {
         tests.test_memory();
+    } else if (str_eq(cmd, "memtest_hard")) {
+        tests.test_memory_hard();
     } else if (str_eq(cmd, "shutdown")) {
         console.puts("Shutting down...\n");
         shutdown();
@@ -111,8 +114,14 @@ pub fn display_uptime() void {
     const current_time = get_system_time();
     const uptime = current_time - boot_time;
 
+    // Convert to seconds, considering the timer frequency
+    const timer_freq: u64 = asm ("mrs %[freq], cntfrq_el0"
+        : [freq] "=r" (-> u64),
+    );
+    const uptime_seconds = uptime / timer_freq;
+
     console.puts("System uptime: ");
-    console.putInt(uptime / 1000000); // Convert microseconds to seconds
+    console.putInt(uptime_seconds);
     console.puts(" seconds\n");
 }
 
