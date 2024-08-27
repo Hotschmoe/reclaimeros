@@ -1,8 +1,8 @@
 const console = @import("console.zig");
 
 pub const PAGE_SIZE: usize = 4096;
-const TOTAL_PAGES: usize = 1024; // 4MB of manageable memory
-const MEMORY_START: usize = 0x41000000; // Start of manageable memory
+pub const TOTAL_PAGES: usize = 256 * 1024; // 1GB of manageable memory (1024MB / 4KB = 256 * 1024 pages)
+pub const MEMORY_START: usize = 0x41000000; // Start of manageable memory
 
 var page_bitmap: [TOTAL_PAGES]bool = undefined;
 
@@ -15,29 +15,14 @@ pub fn init_memory() void {
 }
 
 pub fn alloc_page() usize {
-    console.puts("Starting page allocation...\n");
-
     var i: usize = 0;
     while (i < page_bitmap.len) {
         if (!page_bitmap[i]) {
             page_bitmap[i] = true;
             const page_address = MEMORY_START + (i * PAGE_SIZE);
-
-            console.puts("Allocated page at address: 0x");
-            console.putIntHex(page_address); // Use Hex format for better readability in memory addresses
-            console.puts("\n");
-
             return page_address;
         }
-
         i += 1;
-
-        // Debugging statement to show progress
-        if (i % 100 == 0) {
-            console.puts("Checked ");
-            console.putInt(i);
-            console.puts(" pages during allocation.\n");
-        }
     }
 
     console.puts("Allocation failed: No free pages available\n");
@@ -61,32 +46,19 @@ pub fn free_page(addr: usize) void {
     }
 
     page_bitmap[page_index] = false;
-    console.puts("Freed page at address: 0x");
-    console.putIntHex(addr);
-    console.puts("\n");
 }
 
 pub fn get_free_page_count() usize {
-    console.puts("Starting to count free pages...\n");
     var count: usize = 0;
     var i: usize = 0;
     while (i < page_bitmap.len) {
-        const is_allocated = page_bitmap[i];
-        if (!is_allocated) {
+        if (!page_bitmap[i]) {
             count += 1;
         }
-
-        // Print every 512 pages checked
-        if (i % 512 == 0) {
-            console.puts("Currently checked ");
-            console.putInt(i);
-            console.puts(" pages.\n");
-        }
-
         i += 1;
     }
 
-    console.puts("Finished counting. Total free pages: ");
+    console.puts("Total free pages: ");
     console.putInt(count);
     console.puts("\n");
     return count;

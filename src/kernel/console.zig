@@ -1,5 +1,5 @@
 const std = @import("std");
-
+const utilities = @import("utilities.zig");
 // QEMU UART address
 const UART_BASE: usize = 0x09000000;
 
@@ -7,19 +7,12 @@ const UART_BASE: usize = 0x09000000;
 const UART_DR: *volatile u32 = @ptrFromInt(UART_BASE + 0x00);
 const UART_FR: *volatile u32 = @ptrFromInt(UART_BASE + 0x18);
 
-fn delay(cycles: usize) void {
-    var i: usize = 0;
-    while (i < cycles) : (i += 1) {
-        asm volatile ("" ::: "memory");
-    }
-}
-
 pub fn putchar(c: u8) void {
     while ((UART_FR.* & (1 << 5)) != 0) {
-        delay(100);
+        utilities.delay(100);
     }
     UART_DR.* = c;
-    delay(1000);
+    utilities.delay(1000);
 }
 
 pub fn puts(s: []const u8) void {
@@ -70,4 +63,11 @@ pub fn putIntHex(value: usize) void {
         i -= 1;
         putchar(temp[i]);
     }
+}
+
+pub fn getchar() u8 {
+    while ((UART_FR.* & (1 << 4)) != 0) {
+        utilities.delay(100);
+    }
+    return @truncate(UART_DR.*);
 }
