@@ -33,21 +33,5 @@ pub fn build(b: *std.Build) void {
     const kernel_step = b.step("kernel", "Build the kernel");
     kernel_step.dependOn(&install_step.step);
 
-    // Add a run step to execute QEMU with the generated kernel.elf file
-    const run_cmd_args = &[_][]const u8{
-        "qemu-system-aarch64.exe",
-        "-machine",
-        "virt",
-        "-cpu",
-        "cortex-a72",
-        "-kernel",
-        "zig-out/bin/kernel.elf",
-        "-nographic",
-        "-m",
-        "128M",
-    };
-    const run_cmd = b.addSystemCommand(run_cmd_args);
-    run_cmd.step.dependOn(&install_step.step);
-    const run_step = b.step("run", "Run QEMU with the built kernel");
-    run_step.dependOn(&run_cmd.step);
+    // Remove the run step and QEMU command from here
 }
