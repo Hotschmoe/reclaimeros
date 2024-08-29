@@ -43,8 +43,8 @@ pub fn process_command() void {
     } else if (str_eq(cmd, "reboot")) {
         console.puts("Rebooting...\n");
         reboot();
-    } else if (str_eq(cmd, "meminfo")) {
-        display_meminfo();
+        // } else if (str_eq(cmd, "meminfo")) {
+        //     display_meminfo();
     } else if (str_eq(cmd, "uptime")) {
         display_uptime();
     } else if (str_starts_with(cmd, "echo ")) {
@@ -53,10 +53,10 @@ pub fn process_command() void {
     } else if (str_eq(cmd, "version")) {
         console.puts("RECLAIMER Kernel v0.1\n");
         console.puts("Built with Zig 0.13 for aarch64\n");
-    } else if (str_eq(cmd, "memtest")) {
-        tests.test_memory();
-    } else if (str_eq(cmd, "memtest_hard")) {
-        tests.test_memory_hard();
+        // } else if (str_eq(cmd, "memtest")) {
+        //     tests.test_memory();
+        // } else if (str_eq(cmd, "memtest_hard")) {
+        //     tests.test_memory_hard();
     } else if (str_eq(cmd, "shutdown")) {
         console.puts("Shutting down...\n");
         shutdown();
@@ -80,29 +80,29 @@ pub fn str_starts_with(s: []const u8, prefix: []const u8) bool {
     return str_eq(s[0..prefix.len], prefix);
 }
 
-pub fn display_meminfo() void {
-    console.puts("Gathering memory information...\n");
-    const free_pages = memory.get_free_page_count();
-    const total_pages = memory.TOTAL_PAGES;
-    const used_pages = total_pages - free_pages;
+// pub fn display_meminfo() void {
+//     console.puts("Gathering memory information...\n");
+//     const free_pages = memory.get_free_page_count();
+//     const total_pages = memory.TOTAL_PAGES;
+//     const used_pages = total_pages - free_pages;
 
-    console.puts("Memory Information:\n");
-    console.puts("  Total memory: ");
-    console.putInt(total_pages * memory.PAGE_SIZE / 1024 / 1024);
-    console.puts(" MB\n");
-    console.puts("  Total pages: ");
-    console.putInt(total_pages);
-    console.puts("\n  Used pages:  ");
-    console.putInt(used_pages);
-    console.puts(" (");
-    console.putInt((used_pages * 100) / total_pages);
-    console.puts("%)\n");
-    console.puts("  Free pages:  ");
-    console.putInt(free_pages);
-    console.puts(" (");
-    console.putInt((free_pages * 100) / total_pages);
-    console.puts("%)\n");
-}
+//     console.puts("Memory Information:\n");
+//     console.puts("  Total memory: ");
+//     console.putInt(total_pages * memory.PAGE_SIZE / 1024 / 1024);
+//     console.puts(" MB\n");
+//     console.puts("  Total pages: ");
+//     console.putInt(total_pages);
+//     console.puts("\n  Used pages:  ");
+//     console.putInt(used_pages);
+//     console.puts(" (");
+//     console.putInt((used_pages * 100) / total_pages);
+//     console.puts("%)\n");
+//     console.puts("  Free pages:  ");
+//     console.putInt(free_pages);
+//     console.puts(" (");
+//     console.putInt((free_pages * 100) / total_pages);
+//     console.puts("%)\n");
+// }
 
 var boot_time: u64 = undefined;
 
